@@ -84,12 +84,25 @@ class ProductReturnSerializer(serializers.ModelSerializer):
     # Not fully stable, shouldn't be a problem though if database is backed up
     # Could wrap get in a try catch, and then make a call to get currency endpoint, to make stable
     def get_rates(self, obj):
-        currency_instance = CurrencyRates.objects.get()
+        try:
+        # Fetch the latest CurrencyRates instance (adjust filtering as necessary)
+            currency_instance = CurrencyRates.objects.latest('updated_at')  # Example: use a timestamp field
+        except CurrencyRates.DoesNotExist:
+        # Handle case where no CurrencyRates instance exists
+            return {"error": "Currency rates not available"}
+        except CurrencyRates.MultipleObjectsReturned:
+        # Optionally handle case for multiple records, if relevant
+            currency_instance = CurrencyRates.objects.first()  # Fallback to the first instance
+
+    # Serialize the instance
         serializer = CurrencyRatesSerializer(instance=currency_instance)
         data = serializer.data
-        data.pop("rates")
-        data.pop("currency_rate_timestamp")
+
+    # Remove keys, ensuring they exist
+        data.pop("rates", None)
+        data.pop("currency_rate_timestamp", None)
         return data
+
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):
