@@ -16,113 +16,6 @@ import uuid
 
 # Create your models here.
 
-
-# class CertificateType(models.Model):
-#     BRC = "BRC"
-#     COSMOS = "COSMOS"
-#     CFC = "CFC"
-#     EnergyStar = "EnergyStar"
-#     FairTradeCertificate = "FairTradeCertificate"
-#     FCC = "FCC"
-#     FSC = "FSC"
-#     GOTS = "GOTS"
-#     HACCP = "HACCP"
-#     HALAL = "HALAL"
-#     ISO9001 = "ISO9001"
-#     ISO14001 = "ISO14001"
-#     ISO22000 = "ISO22000"
-#     ISO_TS = "ISO_TS"
-#     Kosher = "Kosher"
-#     Non_GMO = "Non_GMO"
-#     RoHS = "RoHS"
-#     Wrap = "Wrap"
-#     Other = "Other"
-
-#     CERTIFICATE_TYPE_CHOICES = [
-#         ("BRC", _("BRC Standard")),
-#         ("COSMOS", _("COSMOS Organic and Natural")),
-#         ("CFC", _("Cruelty Free Certificate")),
-#         ("EnergyStar", _("Energy Star")),
-#         ("FairTradeCertificate", _("Fair Trade Certificate")),
-#         ("FCC", _("FCC Certificate")),
-#         ("FSC", _("FSC Certificate")),
-#         ("GOTS", _("GOTS Certificcate")),
-#         ("HACCP", _("HACCP")),
-#         ("HALAL", _("HALAL Certificate")),
-#         ("ISO9001", _("ISO 9001")),
-#         ("ISO14001", _("ISO 14001")),
-#         ("ISO22000", _("ISO 22000")),
-#         ("ISO_TS", _("ISO_TS 16949")),
-#         ("Kosher", _("Kosher")),
-#         ("Non-GMO", _("Non-GMO Certificate")),
-#         ("RoHS", _("RoHS Compliance")),
-#         ("Wrap", _("Wrap Certificate")),
-#         ("Other", _("Other")),
-#     ]
-
-
-# class TimeSpan(models.Model):
-#     WEEKLY = "Weekly"
-#     MONTHLY = "Monthly"
-#     QUARTERLY = "Quarterly"
-#     BI_YEARLY = "Bi-Yearly"
-#     YEARLY = "Yearly"
-
-#     TIME_SPAN_CHOICES = [
-#         ("Weekly", _("Weekly")),
-#         ("Monthly", _("Monthly")),
-#         ("Quarterly", _("Quarterly")),
-#         ("Bi-Yearly", _("Bi-Yearly")),
-#         ("Yearly", _("Yearly")),
-#     ]
-
-
-# class ShippingInformation(models.Model):
-#     ESX = "ESX"
-#     FCA = "FCA"
-#     FAS = "FAS"
-#     FOB = "FOB"
-#     CFR_CIF = "CFR/CIF"
-#     DPU = "DPU"
-#     DPA = "DPA"
-#     DDP = "DDP"
-
-#     SHIPPING_INFORMATION_CHOICES = [
-#         ("ESX", _("ESX")),
-#         ("FCA", _("FCA")),
-#         ("FAS", _("FAS")),
-#         ("FOB", _("FOB")),
-#         ("CFR/CIF", _("CFR/CIF")),
-#         ("DPU", _("DPU")),
-#         ("DPA", _("DPA")),
-#         ("DDP", _("DDP")),
-#     ]
-
-
-# class TradingAreas(models.Model):
-#     DOMESTIC = "Domestic"
-#     INTERNATIONAL = "International"
-
-#     TRADING_AREAS_CHOICES = [
-#         (DOMESTIC, _("Domestic")),
-#         (INTERNATIONAL, _("International")),
-#     ]
-
-
-# class PAYMENTMETHODS(models.Model):
-#     PAPSS = "papss"
-#     PEOPLESPAY = "peoples_pay"
-#     LETTEROFCREDIT = "letter_of_credit"
-#     CASHAGAINSTDOCUMENT = "cash_against_document"
-
-#     PAYMENT_METHODS_CHOICES = [
-#         (PAPSS, _("PAPSS")),
-#         (PEOPLESPAY, _("Peoples Pay")),
-#         (LETTEROFCREDIT, _("Letter of Credit")),
-#         (CASHAGAINSTDOCUMENT, _("Cash Against Document")),
-#     ]
-
-
 class TimeStampedUUIDModel(models.Model):
     pkid = models.BigAutoField(primary_key=True, editable=False)
     id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -409,57 +302,57 @@ add "max_choices" to limit the number of choices for the radio buttons
         return str(self.name) if self.name else ""
 
 
-class CurrencyRates(models.Model):
-    currency_rate_timestamp = models.DateTimeField()
-    ghs = models.FloatField(default=1.0, blank=True, null=True)
-    tzs = models.FloatField(default=1.0, blank=True, null=True)
-    xof = models.FloatField(default=1.0, blank=True, null=True)
-    xaf = models.FloatField(default=1.0, blank=True, null=True)
-    ngn = models.FloatField(default=1.0, blank=True, null=True)
-    eur = models.FloatField(default=1.0, blank=True, null=True)
-    usd = models.FloatField(default=1.0, blank=True, null=True)
+# class CurrencyRates(models.Model):
+#     currency_rate_timestamp = models.DateTimeField()
+#     ghs = models.FloatField(default=1.0, blank=True, null=True)
+#     tzs = models.FloatField(default=1.0, blank=True, null=True)
+#     xof = models.FloatField(default=1.0, blank=True, null=True)
+#     xaf = models.FloatField(default=1.0, blank=True, null=True)
+#     ngn = models.FloatField(default=1.0, blank=True, null=True)
+#     eur = models.FloatField(default=1.0, blank=True, null=True)
+#     usd = models.FloatField(default=1.0, blank=True, null=True)
 
-    @property
-    def rates(self):
-        if self.currency_rate_timestamp + timedelta(hours=1) < now():
-            try:
-                response = requests.get(
-                    "http://api.exchangeratesapi.io/v1/latest",
-                    params={
-                        "access_key": settings.EXCHANGE_RATE_API_KEY,
-                        "symbols": "GHS,XOF,TZS,NGN,USD,LRD,GMD,CVE,GNF,MRU,XAF,CDF,AOA,RWF,BIF,STN,ZAR,NAD,BWP,KES",
-                    },
-                )
-                data = response.json()
-                if data.get("success"):
-                    self.ghs = data["rates"].get("GHS", self.ghs)
-                    self.tzs = data["rates"].get("TZS", self.tzs)
-                    self.xof = data["rates"].get("XOF", self.xof)
-                    self.ngn = data["rates"].get("NGN", self.ngn)
-                    self.xaf = data["rates"].get("XAF", self.xaf)
-                    self.eur = data["rates"].get("EUR", self.eur)
-                    self.usd = data["rates"].get("USD", self.usd)
-                    self.currency_rate_timestamp = now()
-                    self.save()
-                    return data["rates"]
-            except requests.RequestException as e:
-                # Handle request exceptions (e.g., network issues)
-                pass
-        return {
-            "GHS": self.ghs,
-            "TZS": self.tzs,
-            "XOF": self.xof,
-            "NGN": self.ngn,
-            "XAF": self.xaf,
-            "EUR": self.eur,
-            "USD": self.usd,
-        }
+#     @property
+#     def rates(self):
+#         if self.currency_rate_timestamp + timedelta(hours=1) < now():
+#             try:
+#                 response = requests.get(
+#                     "http://api.exchangeratesapi.io/v1/latest",
+#                     params={
+#                         "access_key": settings.EXCHANGE_RATE_API_KEY,
+#                         "symbols": "GHS,XOF,TZS,NGN,USD,LRD,GMD,CVE,GNF,MRU,XAF,CDF,AOA,RWF,BIF,STN,ZAR,NAD,BWP,KES",
+#                     },
+#                 )
+#                 data = response.json()
+#                 if data.get("success"):
+#                     self.ghs = data["rates"].get("GHS", self.ghs)
+#                     self.tzs = data["rates"].get("TZS", self.tzs)
+#                     self.xof = data["rates"].get("XOF", self.xof)
+#                     self.ngn = data["rates"].get("NGN", self.ngn)
+#                     self.xaf = data["rates"].get("XAF", self.xaf)
+#                     self.eur = data["rates"].get("EUR", self.eur)
+#                     self.usd = data["rates"].get("USD", self.usd)
+#                     self.currency_rate_timestamp = now()
+#                     self.save()
+#                     return data["rates"]
+#             except requests.RequestException as e:
+#                 # Handle request exceptions (e.g., network issues)
+#                 pass
+#         return {
+#             "GHS": self.ghs,
+#             "TZS": self.tzs,
+#             "XOF": self.xof,
+#             "NGN": self.ngn,
+#             "XAF": self.xaf,
+#             "EUR": self.eur,
+#             "USD": self.usd,
+#         }
 
-    def save(self, *args, **kwargs):
-        if not self.pk and CurrencyRates.objects.exists():
-            # If you're trying to create a new instance and one already exists
-            raise ValidationError("There is can be only one CurrentRates instance")
-        return super(CurrencyRates, self).save(*args, **kwargs)
+#     def save(self, *args, **kwargs):
+#         if not self.pk and CurrencyRates.objects.exists():
+#             # If you're trying to create a new instance and one already exists
+#             raise ValidationError("There is can be only one CurrentRates instance")
+#         return super(CurrencyRates, self).save(*args, **kwargs)
 
 
 class ProductViews(TimeStampedUUIDModel):

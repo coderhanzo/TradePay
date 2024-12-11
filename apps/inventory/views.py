@@ -10,7 +10,7 @@ from .serializers import (
     ProductCreateSerializer,
     CategorySerializer,
     ProductImageSerializer,
-    CurrencyRatesSerializer,
+    # CurrencyRatesSerializer,
     ProductDocumentSerializer,
     CategoryReturnSerializer,
     SourcingRequestSerializer,
@@ -21,7 +21,7 @@ from copy import deepcopy
 from .models import (
     Product,
     Category,
-    CurrencyRates,
+    # CurrencyRates,
     Company,
     ProductViews,
     SourcingRequest,
@@ -108,16 +108,40 @@ class SearchProduct(generics.ListAPIView):
 @permission_classes([permissions.IsAuthenticated])
 @authentication_classes([JWTAuthentication])
 def get_my_products(request):
-    user_instance = User.objects.filter(id=request.user.id)
-    products = []
-    if user_instance[0].admin_profile:
-        for company in user_instance[0].admin_profile.companies.all():
-            products.extend(
-                ProductReturnSerializer(instance=company.products.all(), many=True).data
+    try:
+        # Get the user instance
+        user_instance = User.objects.get(id=request.user.id)
+
+        # Check if the user has an admin profile
+        if (
+            not hasattr(user_instance, "admin_profile")
+            or not user_instance.admin_profile
+        ):
+            return Response(
+                {"detail": "Must be an admin"}, status=status.HTTP_401_UNAUTHORIZED
             )
-    else:
-        return Response("Must be an admin", status=status.HTTP_401_UNAUTHORIZED)
-    return Response(products, status=status.HTTP_200_OK)
+
+        # Collect products for all companies under the admin's profile
+        products = []
+        for company in user_instance.admin_profile.companies.all():
+            company_products = company.products.all()
+            serialized_products = ProductReturnSerializer(
+                instance=company_products, many=True
+            ).data
+            products.extend(serialized_products)
+
+        return Response(products, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    except Exception as e:
+        # Log the exception for debugging (you can use proper logging here)
+        print(f"Error: {e}")
+        return Response(
+            {"detail": "An error occurred"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 @api_view(["GET"])
@@ -375,21 +399,21 @@ def edit_category(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(["GET"])
-@transaction.atomic
-def get_currency_rates(request):
-    rates = None
-    data = request.data
-    try:
-        rates = CurrencyRates.objects.get()
-    except CurrencyRates.DoesNotExist:
-        data["currency_rate_timestamp"] = now() - timedelta(hours=3)
-        serializer = CurrencyRatesSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        rates = serializer.save()
+# @api_view(["GET"])
+# @transaction.atomic
+# def get_currency_rates(request):
+#     rates = None
+#     data = request.data
+#     try:
+#         rates = CurrencyRates.objects.get()
+#     except CurrencyRates.DoesNotExist:
+#         data["currency_rate_timestamp"] = now() - timedelta(hours=3)
+#         serializer = CurrencyRatesSerializer(data=data)
+#         serializer.is_valid(raise_exception=True)
+#         rates = serializer.save()
 
-    serializer = CurrencyRatesSerializer(rates)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+#     serializer = CurrencyRatesSerializer(rates)
+#     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -399,7 +423,6 @@ def get_all_products(request):
     serializer = ProductReturnSerializer(data=Product.objects.all(), many=True)
     serializer.is_valid()
     return Response({"all_products": serializer.data}, status=status.HTTP_200_OK)
-
 
 
 class SourcingRequestListCreateView(generics.ListCreateAPIView):
@@ -415,7 +438,6 @@ class SourcingRequestListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
 
 
 class SourcingRequestDeleteView(generics.DestroyAPIView):

@@ -3,7 +3,7 @@ from .models import (
     Product,
     Category,
     ProductImage,
-    CurrencyRates,
+    # CurrencyRates,
     ProductDocument,
     SourcingRequest,
     QuotationForm,
@@ -13,15 +13,15 @@ from utils.utils import Base64File
 import base64
 
 
-class CurrencyRatesSerializer(serializers.ModelSerializer):
-    rates = serializers.SerializerMethodField()
+# class CurrencyRatesSerializer(serializers.ModelSerializer):
+#     rates = serializers.SerializerMethodField()
 
-    class Meta:
-        model = CurrencyRates
-        fields = "__all__"
+#     class Meta:
+#         model = CurrencyRates
+#         fields = "__all__"
 
-    def get_rates(self, obj):
-        return obj.rates
+#     def get_rates(self, obj):
+#         return obj.rates
 
 
 class ProductReturnSerializer(serializers.ModelSerializer):
@@ -29,7 +29,7 @@ class ProductReturnSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField(required=False)
     brochure = serializers.SerializerMethodField(required=False)
     seller = serializers.SerializerMethodField(required=False)
-    rates = serializers.SerializerMethodField(required=False)
+    # rates = serializers.SerializerMethodField(required=False)
     documents = serializers.SerializerMethodField(required=False)
     about_company = serializers.SerializerMethodField(required=False)
 
@@ -83,26 +83,25 @@ class ProductReturnSerializer(serializers.ModelSerializer):
 
     # Not fully stable, shouldn't be a problem though if database is backed up
     # Could wrap get in a try catch, and then make a call to get currency endpoint, to make stable
-    def get_rates(self, obj):
-        try:
-        # Fetch the latest CurrencyRates instance (adjust filtering as necessary)
-            currency_instance = CurrencyRates.objects.latest('updated_at')  # Example: use a timestamp field
-        except CurrencyRates.DoesNotExist:
-        # Handle case where no CurrencyRates instance exists
-            return {"error": "Currency rates not available"}
-        except CurrencyRates.MultipleObjectsReturned:
-        # Optionally handle case for multiple records, if relevant
-            currency_instance = CurrencyRates.objects.first()  # Fallback to the first instance
+    # def get_rates(self, obj):
+    #     try:
+    #     # Fetch the latest CurrencyRates instance (adjust filtering as necessary)
+    #         currency_instance = CurrencyRates.objects.latest('updated_at')  # Example: use a timestamp field
+    #     except CurrencyRates.DoesNotExist:
+    #     # Handle case where no CurrencyRates instance exists
+    #         return {"error": "Currency rates not available"}
+    #     except CurrencyRates.MultipleObjectsReturned:
+    #     # Optionally handle case for multiple records, if relevant
+    #         currency_instance = CurrencyRates.objects.first()  # Fallback to the first instance
 
-    # Serialize the instance
-        serializer = CurrencyRatesSerializer(instance=currency_instance)
-        data = serializer.data
+    # # Serialize the instance
+    #     serializer = CurrencyRatesSerializer(instance=currency_instance)
+    #     data = serializer.data
 
-    # Remove keys, ensuring they exist
-        data.pop("rates", None)
-        data.pop("currency_rate_timestamp", None)
-        return data
-
+    # # Remove keys, ensuring they exist
+    #     data.pop("rates", None)
+    #     data.pop("currency_rate_timestamp", None)
+    #     return data
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):
@@ -110,26 +109,6 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         required=False, many=True, queryset=Category.objects.all()
     )
     brochure = Base64File(required=False)
-
-    # Payments
-    papss = serializers.SerializerMethodField()
-    peoples_pay = serializers.SerializerMethodField()
-    letter_of_credit = serializers.SerializerMethodField()
-    cash_against_document = serializers.SerializerMethodField()
-
-    # Shipping information
-    esx = serializers.SerializerMethodField()
-    fca = serializers.SerializerMethodField()
-    fas = serializers.SerializerMethodField()
-    fob = serializers.SerializerMethodField()
-    cfr_cif = serializers.SerializerMethodField()
-    dpu = serializers.SerializerMethodField()
-    dpa = serializers.SerializerMethodField()
-    ddp = serializers.SerializerMethodField()
-
-    # Trading areas
-    domestic = serializers.SerializerMethodField()
-    international = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -241,7 +220,6 @@ class QuotationImageSerializer(serializers.ModelSerializer):
 
 
 class QuotationSerializer(serializers.ModelSerializer):
-
 
     class Meta:
         model = QuotationForm

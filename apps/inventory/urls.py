@@ -8,7 +8,7 @@ urlpatterns = [
     path("total-products/", views.get_number_of_products, name="total"),
     path("create-category/", views.CreateCategory.as_view(), name="create_category"),
     path("categories/", views.SearchCategories.as_view(), name="category_search"),
-    path("currency-rates/", views.get_currency_rates, name="get_currency_rates"),
+    # path("currency-rates/", views.get_currency_rates, name="get_currency_rates"),
     path("edit-category/", views.edit_category, name="update_category"),
     path("disable-product/", views.disable_product),
     path("my-products/", views.get_my_products),

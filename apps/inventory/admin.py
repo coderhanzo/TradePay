@@ -3,7 +3,7 @@ from .models import (
     Category,
     Product,
     ProductImage,
-    CurrencyRates,
+    # CurrencyRates,
     ProductViews,
     SourcingRequest,
     QuotationForm,
@@ -18,7 +18,7 @@ class ProductAdmin(admin.ModelAdmin):
 admin.site.register(Category)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductImage)
-admin.site.register(CurrencyRates)
+# admin.site.register(CurrencyRates)
 admin.site.register(ProductViews)
 admin.site.register(SourcingRequest)
 admin.site.register(QuotationForm)
