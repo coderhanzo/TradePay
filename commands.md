@@ -1,3 +1,12 @@
+## -- build the containers/image
+docker-compose up --build 
+
+## --remove all... N.B - stop all containers before remove, do not remove containers in production
+docker rm $(docker ps -a -q)
+
+## run the shell of a container
+docker exec -it Adeeny-db bash
+
 ## --- mysql Commands ---
 use (database_name)
 SHOW TABLES;
